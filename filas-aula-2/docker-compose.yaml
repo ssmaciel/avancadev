@@ -1,8 +1,52 @@
-version: '3'
+version: '3.8'
 
 services:
 
+  microservicea:
+    container_name: "microservice-a"
+    image: samukamaciel/avancadev-ms-01
+    ports: 
+      - "9090:9090"
+    environment: 
+      - "RABBITMQ_DEFAULT_USER=rabbitmq"
+      - "RABBITMQ_DEFAULT_PASS=rabbitmq"
+      - "RABBITMQ_DEFAULT_HOST=rabbit"
+      - "RABBITMQ_DEFAULT_PORT=5672"
+      - "RABBITMQ_DEFAULT_VHOST=/"
+      - "RABBITMQ_CONSUMER_NAME=app-name"
+      - "RABBITMQ_CONSUMER_QUEUE_NAME=exemplo"
+      - "RABBITMQ_NOTIFICATION_EX=amq.direct"
+      - "RABBITMQ_NOTIFICATION_ROUTING_KEY=jobs"
+      - "RABBITMQ_DLX=dlx"
+
+  microserviceb:
+    container_name: "microservice-b"
+    restart: always
+    tty: true
+    image: samukamaciel/avancadev-ms-02
+    environment: 
+      - "RABBITMQ_DEFAULT_USER=rabbitmq"
+      - "RABBITMQ_DEFAULT_PASS=rabbitmq"
+      - "RABBITMQ_DEFAULT_HOST=rabbit"
+      - "RABBITMQ_DEFAULT_PORT=5672"
+      - "RABBITMQ_DEFAULT_VHOST=/"
+      - "RABBITMQ_CONSUMER_NAME=payment-ms"
+      - "RABBITMQ_CONSUMER_QUEUE_NAME=orders"
+      - "RABBITMQ_NOTIFICATION_EX=amq.direct"
+      - "RABBITMQ_NOTIFICATION_ROUTING_KEY="
+      - "RABBITMQ_DLX=dlx"
+      - "URL_MS_03=microservicec"
+    depends_on: 
+      - "rabbit"
+
+  microservicec:
+    container_name: "microservice-c"
+    image: samukamaciel/avancadev-ms-03
+    ports: 
+      - "9092:9092"
+
   rabbit:
+    container_name: "rabbit"
     image: "rabbitmq:3-management"
     environment:
       RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
