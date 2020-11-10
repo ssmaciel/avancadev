@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice-c
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice-c
+  template:
+    metadata:
+      labels:
+        app: microservice-c
+    spec:
+      containers:
+      - name: microservice-c
+        image: samukamaciel/avancadev-ms-03
+        ports:
+        - containerPort: 9092
+

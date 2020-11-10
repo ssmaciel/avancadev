@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice-a
+  template:
+    metadata:
+      labels:
+        app: microservice-a
+    spec:
+      containers:
+      - name: microservice-a
+        image: samukamaciel/avancadev-ms-01
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 9090
+        
+        env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: microservico-secret
+                  key: RABBITMQ_DEFAULT_USER
+
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: microservico-secret
+                  key: RABBITMQ_DEFAULT_PASS
+
+            - name: RABBITMQ_DEFAULT_HOST
+              value: rabbitmq-service
+
+      volumes:
+        - name: microservico-conf
+          configMap:
+            name: microservico-conf
+            items:
+              - key: env
+                path: .env
+              
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice-b
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice-b
+  template:
+    metadata:
+      labels:
+        app: microservice-b
+    spec:
+      containers:
+      - name: microservice-b
+        image: samukamaciel/avancadev-ms-02
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+
+        env:
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: microservico-secret
+                  key: RABBITMQ_DEFAULT_USER
+
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: microservico-secret
+                  key: RABBITMQ_DEFAULT_PASS
+
+            - name: RABBITMQ_DEFAULT_HOST
+              value: rabbitmq-service
+
+            - name: URL_MS_03
+              value: microservice-c
+
+      volumes:
+        - name: microservico-conf
+          configMap:
+            name: microservico-conf
+            items:
+              - key: env
+                path: .env
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microservice-c
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice-c
+  template:
+    metadata:
+      labels:
+        app: microservice-c
+    spec:
+      containers:
+      - name: microservice-c
+        image: samukamaciel/avancadev-ms-03
+        ports:
+        - containerPort: 9092
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: "rabbitmq:3-management"
+          ports:
+            - containerPort: 15672
+            - containerPort: 5672
+          env:
+            - name: RABBITMQ_ERLANG_COOKIE
+              value: "SWQOKODSQALRPCLNMEQG"
+            - name: RABBITMQ_DEFAULT_USER
+              value: "rabbitmq"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "rabbitmq"
+            - name: RABBITMQ_DEFAULT_VHOST
+              value: "/"

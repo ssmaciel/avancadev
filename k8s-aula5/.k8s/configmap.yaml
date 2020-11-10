@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservico-conf
+  labels:
+    name: microservico-conf
+data: 
+  env: |
+    RABBITMQ_DEFAULT_USER=rabbitmq
+    RABBITMQ_DEFAULT_PASS=rabbitmq
+    RABBITMQ_DEFAULT_HOST=localhost
+    RABBITMQ_DEFAULT_PORT=5672
+    RABBITMQ_DEFAULT_VHOST=/
+    RABBITMQ_CONSUMER_NAME=app-name
+    RABBITMQ_CONSUMER_QUEUE_NAME=exemplo
+    RABBITMQ_NOTIFICATION_EX=amq.direct
+    RABBITMQ_NOTIFICATION_ROUTING_KEY=jobs
+    RABBITMQ_DLX=dlx
+    URL_MS_01=microservice-a
+    URL_MS_02=microservice-b
+    URL_MS_03=microservice-c
